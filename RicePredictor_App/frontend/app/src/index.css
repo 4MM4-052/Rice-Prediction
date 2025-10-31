@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+input.no-spinner::-webkit-inner-spin-button,
+input.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input.no-spinner[type="number"] {
+  -moz-appearance: textfield;
+}
