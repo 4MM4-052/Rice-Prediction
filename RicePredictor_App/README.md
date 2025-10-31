@@ -1,40 +1,44 @@
-## Member List 
+# Thực Thi BackEnd
 
-1. Nguyễn Hoàng Tiến Danh - 0869635xxx - B2205858 - danhb2205858@student.ctu.edu.vn
-2. Thân Quốc Tuấn - 0584020xxx - B2207574 - tuanb220574@student.ctu.edu.vn
-3. Lý Trí Khải - 0848041xxx - B2207530 - khaib2207530@student.ctu.edu.vn
+> ### **Cách chạy backend: Flask**
+>
+> &nbsp;&nbsp;&nbsp; **1. Vào thư mục backend**
 
-## Technologies Used:
+```bash
+cd backend
+```
 
-- Flask 3.1.1
-- React 19.1.0
+&nbsp;&nbsp;&nbsp; **2. Tạo virtual environment**
 
-## Task
+```bash
+python -m venv venv
+.\venv\Scripts\activate  # Trên Windows
+```
 
-Phân tích tập dữ liệu Rice2024
-(https://github.com/ltdaovn/dataset/raw/master/Rice2025.xlsx)
+&nbsp;&nbsp;&nbsp; **3. Cài đặt thư viện phụ thuộc**
 
-- Tìm hiểu dữ liệu
-- Tiền xử lý dữ liệu
-- Phân tích trực quan
-- Xây dựng mô hình máy học (hồi quy, phân lớp, gom nhóm, …)
-- Đánh giá mô hình
-- Xây dựng website để dự đoán loại gạo
+```bash
+pip install -r requirements.txt
+```
 
---- 
+&nbsp;&nbsp;&nbsp; **4. Chạy ứng dụng Flask**
 
-## Application
+```bash
+python app.py
+```
 
-### Mô tả
-Đây là website dự đoán gạo ...
+# Thực Thi FrontEnd
 
-Các giải thuật để dự đoán:
+> ### **Cách chạy frontend**
+>
+> &nbsp;&nbsp;&nbsp; **1. Vào thư mục frontend**
 
-- K-Nearest Neighbors
-- Naive Bayes
-- Decision Tree
-- Random Forest
-- Logistic Regression
-- Support Vector Machine
-- Multilayer Perceptron
-- Adaboost
+```bash
+cd frontend/app
+```
+
+&nbsp;&nbsp;&nbsp; **2. Chạy giao diện**
+
+```bash
+npm run dev
+```

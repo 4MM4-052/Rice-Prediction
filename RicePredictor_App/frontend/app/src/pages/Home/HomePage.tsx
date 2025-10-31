@@ -125,7 +125,7 @@ const HomePage: React.FC = () => {
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto px-6">
           {[
             { value: '3822', label: 'Ảnh gạo đã xử lý', color: 'text-cyan-500', hoverColor: 'text-cyan-400' },
-            { value: '8', label: 'Đặc trưng hình thái', color: 'text-green-500', hoverColor: 'text-green-400' },
+            { value: '7', label: 'Đặc trưng hình thái', color: 'text-green-500', hoverColor: 'text-green-400' },
             { value: '2', label: 'Giống gạo', color: 'text-yellow-500', hoverColor: 'text-yellow-400' },
             { value: 'AI', label: 'Ứng dụng học máy', color: 'text-pink-500', hoverColor: 'text-pink-400' },
           ].map(({ value, label, color, hoverColor }, idx) => (
