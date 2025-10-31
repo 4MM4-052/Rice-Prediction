@@ -10,7 +10,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import re
+import os
 
+save_dir = "RicecPredictor_Train/machine_learning/"
 
 def clean_label(x):
     """Chuẩn hóa nhãn: Xóa khoảng trắng và chuyển về chữ in hoa"""
@@ -133,8 +135,8 @@ def main():
     with open(DESCRIPTION_PATH, 'wb') as f:
         pickle.dump(X.describe(), f)
     
-    pd.DataFrame(X_test_scaled, columns=FEATURE_COLUMNS).to_pickle("X_test_scaled.pkl")
-    pd.Series(y_test, name=TARGET_COLUMN).to_pickle("y_test.pkl")
+    pd.DataFrame(X_test_scaled, columns=FEATURE_COLUMNS).to_pickle(os.path.join(save_dir, "X_test_scaled.pkl"))
+    pd.Series(y_test, name=TARGET_COLUMN).to_pickle(os.path.join(save_dir, "y_test.pkl"))
 
 
     print("\nDữ liệu đã được xử lý và lưu thành công!")

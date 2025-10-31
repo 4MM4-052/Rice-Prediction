@@ -33,4 +33,4 @@ MODEL_NAMES = [
     "MLP",
     "Adaboost"
 ]
-MODEL_PATHS = {name: f"RicecPredictor_Train/machine_learning/{name}.pkl" for name in MODEL_NAMES}
+MODEL_PATHS = {name: f"RicecPredictor_Train/machine_learning/models/{name}.pkl" for name in MODEL_NAMES}

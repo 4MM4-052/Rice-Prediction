@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import pickle
+import os
 
 from collections import Counter
 from sklearn.decomposition import PCA
@@ -25,6 +26,7 @@ from sklearn.neural_network import MLPClassifier
 
 # Cấu hình (đọc từ file config.py)
 from config import DATA_OUTPUT, FEATURES_PATH, TARGET_COLUMN, SCALER_PATH, MODEL_PATHS
+load_dir = "RicecPredictor_Train/machine_learning/"
 
 # ====== Tải dữ liệu đã xử lý ======
 print("Đang tải dữ liệu đã xử lý...")
@@ -37,8 +39,8 @@ try:
         FEATURE_COLUMNS = pickle.load(f)
     
     # Tải lại tập test (đã chuẩn hóa) để đánh giá mô hình
-    X_test_scaled = pd.read_pickle("X_test_scaled.pkl").values
-    y_test = pd.read_pickle("y_test.pkl").values
+    X_test_scaled = pd.read_pickle(os.path.join(load_dir, "X_test_scaled.pkl")).values
+    y_test = pd.read_pickle(os.path.join(load_dir, "y_test.pkl")).values
     
 except Exception as e:
     print(f"Lỗi tải dữ liệu: {e}. Hãy đảm bảo chạy preprocess.py trước!")
