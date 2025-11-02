@@ -9,7 +9,6 @@ FEATURE_COLUMNS = [
     "major_axis_length",
     "minor_axis_length",
     "eccentricity",
-    "convex_area",
     "extent"
 ]
 

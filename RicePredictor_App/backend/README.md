@@ -1,8 +1,8 @@
 # Thực Thi BackEnd
 
 > ### **Cách chạy backend: Flask**
->
-> &nbsp;&nbsp;&nbsp; **1. Vào thư mục backend**
+
+&nbsp;&nbsp;&nbsp; **1. Vào thư mục backend**
 
 ```bash
 cd backend

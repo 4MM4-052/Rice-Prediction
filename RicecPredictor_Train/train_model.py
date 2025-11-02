@@ -62,7 +62,7 @@ print(f"Dữ liệu Training sau SMOTE: {X_train_resampled.shape[0]} mẫu.")
 models = {
     # Giảm C để tăng tính tổng quát hóa
     "SVM": SVC(C=10, class_weight='balanced', gamma='scale', kernel='linear', random_state=42), 
-    "Decision_Tree": DecisionTreeClassifier(class_weight='balanced', max_depth=3, min_samples_split=2, random_state=42), 
+    "Decision_Tree": DecisionTreeClassifier(class_weight='balanced', max_depth=4, min_samples_split=10,  min_samples_leaf=5, random_state=42), 
     "Logistic_Regression": LogisticRegression(C=10, class_weight='balanced', solver='liblinear', random_state=42), 
     "kNN": KNeighborsClassifier(metric='manhattan', n_neighbors=14, weights='distance'), 
     "MLP": MLPClassifier(activation='tanh', hidden_layer_sizes=(100, 50), max_iter=500, solver='adam', random_state=42), 
@@ -84,6 +84,7 @@ for name, model in models.items():
     acc = accuracy_score(y_test, y_pred)
     print(f"Accuracy trên tập Test: {acc:.4f}")
     print(classification_report(y_test, y_pred))
+    
 
     # Lưu mô hình
     model_path = MODEL_PATHS[name]

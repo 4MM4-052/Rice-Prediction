@@ -3,14 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
-
-from config import DATA_PATH, TARGET_COLUMN, FEATURE_COLUMNS, DATA_OUTPUT, FEATURES_PATH, DESCRIPTION_PATH, SCALER_PATH
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 import re
 import os
+
+from scipy.stats import entropy
+from config import DATA_PATH, TARGET_COLUMN, FEATURE_COLUMNS, DATA_OUTPUT, FEATURES_PATH, DESCRIPTION_PATH, SCALER_PATH
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
 
 save_dir = "RicecPredictor_Train/machine_learning/"
 
@@ -20,9 +20,8 @@ def clean_label(x):
     x = x.strip("'\"")
     return x.upper()
 
-
 def clean_number(val):
-    """Làm sạch giá trị số bị lỗi (ví dụ: '429,,,,0830078125')"""
+    """Làm sạch giá trị số bị lỗi"""
     if pd.isna(val):
         return None
     if isinstance(val, str):
@@ -38,7 +37,6 @@ def clean_number(val):
             return None
     return val
 
-
 def main():
     print(f"Đang tải dữ liệu từ {DATA_PATH}")
     try:
@@ -48,99 +46,128 @@ def main():
         print(f"Lỗi khi tải dữ liệu: {e}")
         return
 
-    # 1. Thông tin dữ liệu
-    print("\nThông tin về dataset:")
-
-    # 2. Chuẩn hóa nhãn (Class)
-    print("\n2. Chuẩn hóa nhãn (Class)...")
+    # ===============================
+    # 1. Chuẩn hóa nhãn (Class)
+    # ===============================
     data[TARGET_COLUMN] = data[TARGET_COLUMN].apply(clean_label)
     data[TARGET_COLUMN] = data[TARGET_COLUMN].replace({'C': 'C', 'O': 'O', 'c': 'C', 'o': 'O'})
 
-    # 3. Xóa các cột không cần thiết
+    # ===============================
+    # 2. Xóa cột không cần thiết
+    # ===============================
     cols_to_drop = ['Id', 'Nickname']
     data.drop(columns=[col for col in cols_to_drop if col in data.columns], inplace=True)
 
-    # 4. Làm sạch dữ liệu số
-    print("4. Làm sạch dữ liệu số...")
+    # ===============================
+    # 3. Làm sạch dữ liệu số
+    # ===============================
     for col in data.columns:
         if col in FEATURE_COLUMNS:
             data[col] = data[col].apply(clean_number)
 
-    # 5. Xử lý tương quan Convex_Area và Convex_Area_2
+    # ===============================
+    # 4. Xử lý tương quan Convex_Area và Convex_Area_2
+    # ===============================
+    def calc_entropy(col):
+        counts, _ = np.histogram(col.dropna(), bins=30)
+        return entropy(counts, base=2)
+
     if "Convex_Area" in data.columns and "Convex_Area_2" in data.columns:
         corr = data["Convex_Area"].corr(data["Convex_Area_2"])
-        if corr > 0.9:
-            data.drop(columns="Convex_Area_2", inplace=True)
-            if "Convex_Area_2" in FEATURE_COLUMNS:
-                FEATURE_COLUMNS.remove("Convex_Area_2")
-            print("- Đã loại bỏ 'Convex_Area_2' do tương quan cao.")
+        print(f"Tương quan Convex_Area vs Convex_Area_2: {corr:.2f}")
+        e1 = calc_entropy(data["Convex_Area"])
+        e2 = calc_entropy(data["Convex_Area_2"])
+        print(f"Entropy Convex_Area: {e1:.2f}")
+        print(f"Entropy Convex_Area_2: {e2:.2f}")
+        if corr > 0.95:
+            drop_col = "Convex_Area_2" if e1 >= e2 else "Convex_Area"
+            data.drop(drop_col, axis=1, inplace=True)
+            if drop_col in FEATURE_COLUMNS:
+                FEATURE_COLUMNS.remove(drop_col)
+            print(f"Đã loại bỏ '{drop_col}' do tương quan cao và entropy thấp hơn.")
+        else:
+            print("Không có cặp cột nào cần loại bỏ (tương quan < 0.95).")
 
-    # 6. Xử lý giá trị thiếu bằng SimpleImputer (sử dụng phương pháp 'mean')
-    print("6. Xử lý giá trị thiếu (Impute Mean)...")
+    # ===============================
+    # 5. Xử lý missing value
+    # ===============================
     imputer = SimpleImputer(strategy='mean')
     data[FEATURE_COLUMNS] = imputer.fit_transform(data[FEATURE_COLUMNS])
 
-    # 6.5. Xử lý ngoại lệ (IQR Clipping) - BƯỚC QUAN TRỌNG
-    print("6.5. Xử lý ngoại lệ bằng IQR Clipping...")
+    # ===============================
+    # 6. Xử lý ngoại lệ (IQR Clipping)
+    # ===============================
     for col in FEATURE_COLUMNS:
         Q1 = data[col].quantile(0.25)
         Q3 = data[col].quantile(0.75)
         IQR = Q3 - Q1
-        
         if IQR == 0: 
             continue
-            
         lower = Q1 - 1.5 * IQR
         upper = Q3 + 1.5 * IQR
-        
         data[col] = np.clip(data[col], lower, upper)
 
-    print("Hoàn thành xử lý ngoại lệ.")
+    # ===============================
+    # 7. Chuẩn bị X và y
+    # ===============================
+    X = data[FEATURE_COLUMNS].copy()
+    y = data[TARGET_COLUMN].copy()
 
-    # 7. Tách đặc trưng (X) và nhãn (y)
-    X = data[FEATURE_COLUMNS]
-    y = data[TARGET_COLUMN]
+    # ===============================
+    # 8. Chắc chắn loại bỏ cột Convex_Area trước train
+    # ===============================
+    if 'Convex_Area' in X.columns:
+        X.drop('Convex_Area', axis=1, inplace=True)
+        if 'Convex_Area' in FEATURE_COLUMNS:
+            FEATURE_COLUMNS.remove('Convex_Area')
+        print("Đã loại bỏ cột 'Convex_Area' trước khi huấn luyện.")
 
-    # 8. Mã hóa nhãn (C, O) → (0, 1)
+    # ===============================
+    # 9. Mã hóa nhãn
+    # ===============================
     le = LabelEncoder()
     y_encoded = le.fit_transform(y)
 
-    # 9. Chia dữ liệu thành train/test
-    X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+    # ===============================
+    # 10. Chia train/test
+    # ===============================
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_encoded, test_size=0.2, random_state=42
+    )
 
-    # 10. Chuẩn hóa dữ liệu đầu vào (StandardScaler)
+    # ===============================
+    # 11. Chuẩn hóa dữ liệu
+    # ===============================
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    # 11. Gộp lại và lưu dữ liệu đã xử lý
-    # Lưu SCALER vào file PICKLE (BƯỚC BẠN ĐANG THIẾU)
-    print(f"Đang lưu StandardScaler tại: {SCALER_PATH}")
+    # ===============================
+    # 12. Lưu scaler và dữ liệu pickle
+    # ===============================
+    os.makedirs(save_dir, exist_ok=True)
+
     with open(SCALER_PATH, 'wb') as f:
         pickle.dump(scaler, f)
-    
-    # Lưu dữ liệu training đã xử lý
+
     data_processed = pd.concat([
-        pd.DataFrame(X_train_scaled, columns=FEATURE_COLUMNS), 
+        pd.DataFrame(X_train_scaled, columns=X.columns),
         pd.Series(y_train, name=TARGET_COLUMN)
     ], axis=1)
 
     with open(DATA_OUTPUT, 'wb') as f:
         pickle.dump(data_processed, f)
 
-    # Lưu tập test và các file khác
     with open(FEATURES_PATH, 'wb') as f:
-        pickle.dump(FEATURE_COLUMNS, f)
+        pickle.dump(list(X.columns), f)
 
     with open(DESCRIPTION_PATH, 'wb') as f:
         pickle.dump(X.describe(), f)
-    
-    pd.DataFrame(X_test_scaled, columns=FEATURE_COLUMNS).to_pickle(os.path.join(save_dir, "X_test_scaled.pkl"))
+
+    pd.DataFrame(X_test_scaled, columns=X.columns).to_pickle(os.path.join(save_dir, "X_test_scaled.pkl"))
     pd.Series(y_test, name=TARGET_COLUMN).to_pickle(os.path.join(save_dir, "y_test.pkl"))
 
-
     print("\nDữ liệu đã được xử lý và lưu thành công!")
-
 
 if __name__ == "__main__":
     main()

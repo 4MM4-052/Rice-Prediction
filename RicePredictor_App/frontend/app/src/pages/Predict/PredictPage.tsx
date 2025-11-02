@@ -32,7 +32,6 @@ const defaultForm: RiceInput = {
   minor_axis_length: 0,
   eccentricity: 0,
   extent: 0,
-  convex_area: 0,      // thêm
  
 };
 
@@ -78,12 +77,6 @@ const PredictSchema = Yup.object().shape({
     .positive("Giá trị âm không hợp lệ")
     .min(0.78, "Giá trị quá nhỏ  (0.78 - 0.95)")
     .max(1, "Giá trị quá lớn (0.78 - 0.95)")
-    .required("Vui lòng nhập giá trị"),
-  convex_area: Yup.number()
-    .typeError("Vui lòng nhập số")
-    .positive("Giá trị âm không hợp lệ")
-    .min(7723.00, "Giá trị quá nhỏ (7723.00 - 19099.00 px)")
-    .max(19099.00, "Giá trị quá lớn (7723.00 - 19099.00 px)")
     .required("Vui lòng nhập giá trị"),
   extent: Yup.number()
     .typeError("Vui lòng nhập số")
@@ -141,12 +134,6 @@ const PredictPage: React.FC = () => {
       name: "Eccentricity",
       desc: "Độ lệch tâm của hạt gạo",
       hint: "0.78 - 0.95",
-    },
-        {
-      key: "convex_area",
-      name: "Convex_Area",
-      desc: "Độ lệch tâm của hạt gạo",
-      hint: "7723.00 - 19099.00 px",
     },
     {
       key: "extent",
@@ -219,7 +206,6 @@ const PredictPage: React.FC = () => {
     // Ràng buộc theo yêu cầu:
     const major = random(145.26, 239.01); // 100–300 px
     const minor = random(59.53, Math.min(107.54, major)); // 50–150 px và luôn ≤ major
-    const convex_area = random(7723.00, 19099.00, 0);
    
 
     const area = parseFloat(((Math.PI * major * minor) / 4).toFixed(3));
@@ -237,7 +223,6 @@ const PredictPage: React.FC = () => {
       major_axis_length: major,
       minor_axis_length: minor,
       eccentricity,
-      convex_area,
       extent,
     };
 

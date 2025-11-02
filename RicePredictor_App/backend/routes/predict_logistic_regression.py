@@ -31,7 +31,7 @@ def predict_logistic_regression():
 
         # B4: Lấy tên đặc trưng thủ công (không dùng DataFrame)
         feature_names = [
-            "Area", "Convex_Area","Eccentricity", "Extent",
+            "Area","Eccentricity", "Extent",
             "Major_Axis_Length", "Minor_Axis_Length", "Perimeter"
         ]
 

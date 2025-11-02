@@ -24,7 +24,7 @@ def predict_adaboost():
 
         feature_names = [
             "Area", "Perimeter", "Major_Axis_Length",
-            "Minor_Axis_Length", "Eccentricity", "Convex_Area","Extent"
+            "Minor_Axis_Length", "Eccentricity","Extent"
         ]
         importances = adaboost_model.feature_importances_
         feature_importance_dict = {

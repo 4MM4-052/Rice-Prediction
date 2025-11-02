@@ -4,7 +4,6 @@ export type RiceInput = {
   major_axis_length: number
   minor_axis_length: number
   eccentricity: number
-  convex_area: number
   extent: number
 }
 

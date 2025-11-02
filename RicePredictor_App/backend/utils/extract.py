@@ -10,7 +10,6 @@ def extract_features(data):
             data["major_axis_length"],
             data["minor_axis_length"],
             data["eccentricity"],
-            data["convex_area"],
             data["extent"]
         ]
     except KeyError as e:
@@ -28,7 +27,6 @@ def scale_data(features):
         "Major_Axis_Length",
         "Minor_Axis_Length",
         "Eccentricity",
-        "Convex_Area",
         "Extent"
     ]
 
@@ -46,7 +44,6 @@ def wrap_with_column_names(features):
         "Major_Axis_Length",
         "Minor_Axis_Length",
         "Eccentricity",
-        "Convex_Area",
         "Extent"
     ]
     return pd.DataFrame([features], columns=FEATURE_COLUMNS)

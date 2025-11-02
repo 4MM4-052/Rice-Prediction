@@ -30,11 +30,6 @@ const features: Feature[] = [
     range: "50 – 110 px",
   },
   {
-    name: "Convex_Area",
-    description: "Diện tích vùng lồi (vùng bao ngoài)",
-    range: "7700 – 19000 px",
-  },
-  {
     name: "Eccentricity",
     description: "Độ lệch tâm (giá trị từ 0 đến 1, càng gần 1 thì hình dạng càng thuôn dài)",
     range: "0.70 – 1",
