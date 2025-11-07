@@ -1,11 +1,11 @@
 import React from "react";
 import type { DTResponseData } from "../../types/api";
-// import ModelInputInfo from "../ui/ModelInput";
+//import ModelInputInfo from "../ui/ModelInput";
 // import ModelInfo from "../ui/ModelInfo";
-// import ConfidenceScore from "../ui/ConfidenceScore";
+//import ConfidenceScore from "../ui/ConfidenceScore";
 import TreeFlowFromText from "../ui/TreeFlowFromText";
-// import DtText from "../ui/DtText";
-// import FeatureImportances from "../ui/FeatureImpotances";
+//import DtText from "../ui/DtText";
+//import FeatureImportances from "../ui/FeatureImpotances";
 
 interface Props {
   data: DTResponseData;

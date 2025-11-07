@@ -44,8 +44,8 @@ const features: Feature[] = [
 const FeatureDetail: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto mt-5 p-6 space-y-6 bg-gray-200 dark:bg-[#0F1727] text-black dark:text-[#ececf1] transition-colors duration-300 dark:border dark:border-gray-600 rounded-2xl">
-      <h2 className="text-2xl font-bold text-center">
-        Chi tiết các thuộc tính
+      <h2 className="text-3xl font-extrabold text-white text-center mb-10">
+        Chi Tiết Các Thuộc Tính
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 <div className="flex flex-col items-center py-8 px-4 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-md">

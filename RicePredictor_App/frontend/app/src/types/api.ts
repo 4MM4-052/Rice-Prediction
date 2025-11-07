@@ -59,6 +59,7 @@ export interface SVMResponseData extends BaseResponseData {
   distance_to_boundary: number;
   certainty_score: number;
   hyperparameters: {
+    degree: string | number;
     C: number;
     kernel: string;
     gamma: string;

@@ -37,6 +37,10 @@ const SvmDetailResult: React.FC<Props> = ({ data }) => {
             key: "Gamma",
             value: data.hyperparameters.gamma,
           },
+          {
+            key: "Degree",
+            value: data.hyperparameters.degree,
+          },
         ]}
       /> */}
 

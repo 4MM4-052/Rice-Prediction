@@ -72,7 +72,7 @@ const ModelSummaryAll: React.FC = () => {
 <div className="max-w-6xl mx-auto mt-10 p-8 backdrop-blur-lg bg-white/20 dark:bg-white/10 rounded-3xl border border-white/30 shadow-2xl">
   <div className="flex justify-center">
     <h2 className="text-3xl font-extrabold text-white text-center mb-10">
-      Tóm tắt các giải thuật
+      Tóm Tắt Các Giải Thuật
     </h2>
   </div>
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

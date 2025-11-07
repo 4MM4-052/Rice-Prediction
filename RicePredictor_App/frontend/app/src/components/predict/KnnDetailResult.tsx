@@ -38,7 +38,7 @@ const KnnDetailResult: React.FC<Props> = ({ data }) => {
           },
           { key: "Trọng số (weights)", value: data.hyperparameters.weights },
           { key: "Khoảng cách (metric)", value: data.hyperparameters.metric },
-          { key: "Số mẫu huấn luyện", value: data.training_samples },
+          // { key: "Số mẫu huấn luyện", value: data.training_samples },
         ]}
       /> */}
 
