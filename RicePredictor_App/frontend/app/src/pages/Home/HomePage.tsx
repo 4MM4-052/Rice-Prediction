@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
   const features = [
     { value: '3822', label: 'Ảnh gạo đã xử lý', color: 'text-cyan-500', hoverColor: 'text-cyan-400' },
     { value: '6', label: 'Đặc trưng hình thái', color: 'text-green-500', hoverColor: 'text-green-400' },
-    { value: '1 Nhãn', label: '2 - Giống gạo', color: 'text-yellow-500', hoverColor: 'text-yellow-400' },
+    { value: 'Nhãn', label: '2 - Giống gạo', color: 'text-yellow-500', hoverColor: 'text-yellow-400' },
     { value: 'AI', label: 'Ứng dụng học máy', color: 'text-pink-500', hoverColor: 'text-pink-400' },
   ];
 
@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
         setShowModelSummary(prev => !prev);
         setShowFeatureDetail(false);
         setShowRiceLabels(false);
-    } else if (value === '1 Nhãn') {
+    } else if (value === 'Nhãn') {
         setShowRiceLabels(prev => !prev);
         setShowFeatureDetail(false);
         setShowModelSummary(false);
