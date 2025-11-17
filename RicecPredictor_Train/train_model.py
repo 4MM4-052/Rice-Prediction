@@ -1,21 +1,12 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 import pickle
 import os
 
-from collections import Counter
-from sklearn.decomposition import PCA
-from sklearn.impute import SimpleImputer
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
+from imblearn.combine import SMOTETomek
 
-from imblearn.over_sampling import SMOTE
-
-# Các mô hình học máy
+# ML models
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -24,71 +15,74 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 
-# Cấu hình (đọc từ file config.py)
-from config import DATA_OUTPUT, FEATURES_PATH, TARGET_COLUMN, SCALER_PATH, MODEL_PATHS
+# Config
+from config import DATA_OUTPUT, FEATURES_PATH, TARGET_COLUMN, MODEL_PATHS
 load_dir = "RicecPredictor_Train/machine_learning/"
 
-# ====== Tải dữ liệu đã xử lý ======
+# =======================
+# 1. Load dữ liệu
+# =======================
 print("Đang tải dữ liệu đã xử lý...")
+with open(DATA_OUTPUT, 'rb') as f:
+    data = pickle.load(f)
 
-try:
-    with open(DATA_OUTPUT, 'rb') as f:
-        data = pickle.load(f)
-    
-    with open(FEATURES_PATH, 'rb') as f:
-        FEATURE_COLUMNS = pickle.load(f)
-    
-    # Tải lại tập test (đã chuẩn hóa) để đánh giá mô hình
-    X_test_scaled = pd.read_pickle(os.path.join(load_dir, "X_test_scaled.pkl")).values
-    y_test = pd.read_pickle(os.path.join(load_dir, "y_test.pkl")).values
-    
-except Exception as e:
-    print(f"Lỗi tải dữ liệu: {e}. Hãy đảm bảo chạy preprocess.py trước!")
-    exit()
+with open(FEATURES_PATH, 'rb') as f:
+    FEATURE_COLUMNS = pickle.load(f)
 
-X = data[FEATURE_COLUMNS].values
-y = data[TARGET_COLUMN].values
+# Load test set (scaled)
+X_test_scaled = pd.read_pickle(os.path.join(load_dir, "X_test_scaled.pkl")).values
+y_test = pd.read_pickle(os.path.join(load_dir, "y_test.pkl")).values
 
-# Sử dụng dữ liệu training từ file đã xử lý
-X_train_scaled = X
-y_train = y
+X_train_scaled = data[FEATURE_COLUMNS].values
+y_train = data[TARGET_COLUMN].values
 
-# ====== Áp dụng SMOTE ======
-smote = SMOTE(random_state=42)
-X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
-print(f"Dữ liệu Training sau SMOTE: {X_train_resampled.shape[0]} mẫu.")
+# =======================
+# 2. SMOTE-Tomek
+# =======================
+print("Đang áp dụng SMOTE-Tomek...")
+smote_tomek = SMOTETomek(random_state=42)
+X_train_resampled, y_train_resampled = smote_tomek.fit_resample(X_train_scaled, y_train)
+print(f"Dữ liệu training sau SMOTE-Tomek: {X_train_resampled.shape[0]} mẫu.")
 
-# ====== Danh sách mô hình (ĐÃ SỬA HYPERPARAMETERS) ======
+# =======================
+# 3. Định nghĩa model
+# =======================
 models = {
-    # Giảm C để tăng tính tổng quát hóa
-    "SVM": SVC(C=10, class_weight='balanced', gamma='scale', kernel='linear', random_state=42), 
-    "Decision_Tree": DecisionTreeClassifier(class_weight='balanced', max_depth=4, min_samples_split=10,  min_samples_leaf=5, random_state=42), 
-    "Logistic_Regression": LogisticRegression(C=10, class_weight='balanced', solver='liblinear', random_state=42), 
-    "kNN": KNeighborsClassifier(metric='manhattan', n_neighbors=14, weights='distance'), 
-    "MLP": MLPClassifier(activation='tanh', hidden_layer_sizes=(100, 50), max_iter=500, solver='adam', random_state=42), 
+    "SVM": SVC(C=10, class_weight='balanced', gamma='auto', kernel='rbf', random_state=42), 
+    "Decision_Tree": DecisionTreeClassifier(class_weight='balanced', max_depth=5,
+                                            min_samples_split=2, min_samples_leaf=4,
+                                            random_state=42), 
+    "Logistic_Regression": LogisticRegression(C=0.01, class_weight='balanced',
+                                              solver='lbfgs', random_state=42),
+    "kNN": KNeighborsClassifier(metric='minkowski', n_neighbors=11, weights='distance'), 
+    "MLP": MLPClassifier(activation='relu', learning_rate='constant',
+                         hidden_layer_sizes=(100, 50), max_iter=800,
+                         solver='adam', random_state=42), 
     "Random_Forest": RandomForestClassifier(n_estimators=200, class_weight='balanced', random_state=42), 
     "Naive_Bayes": GaussianNB(),
-    "Adaboost": AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), n_estimators=50, random_state=42)
+    "Adaboost": AdaBoostClassifier(DecisionTreeClassifier(max_depth=1),
+                                   n_estimators=50, random_state=42)
 }
 
-# ====== Huấn luyện và lưu mô hình ======
+# =======================
+# 4. Train, Predict và Save
+# =======================
 for name, model in models.items():
-    print(f"\n==========================================")
+    print("\n==========================================")
     print(f"Đang huấn luyện mô hình: {name}")
+    
+    # Train trên 6 feature gốc sau SMOTE-Tomek
     model.fit(X_train_resampled, y_train_resampled)
-
-    # Dự đoán trên dữ liệu test
+    
+    # Predict trên X_test_scaled (6 feature gốc)
     y_pred = model.predict(X_test_scaled)
-
-    # Đánh giá
+    
     acc = accuracy_score(y_test, y_pred)
     print(f"Accuracy trên tập Test: {acc:.4f}")
     print(classification_report(y_test, y_pred))
     
-
-    # Lưu mô hình
+    # Save model
     model_path = MODEL_PATHS[name]
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)
-    
     print(f"Mô hình '{name}' đã được lưu tại: {model_path}")
